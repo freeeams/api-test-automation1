@@ -1,29 +1,12 @@
 import { test, } from '@playwright/test'
 import z from 'zod';
 
-const todosSchema = z.object({
-    id: z.number().min(0),
-    name: z.string(),
-    username: z.string(),
-    email: z.string(),
-    address: z.object({
-        street: z.string(),
-        suite: z.string(),
-        city: z.string(),
-        zipcode: z.string(),
-        geo: z.object({
-            lat: z.string(),
-            lng: z.string()
-        })
-    }),
-    phone: z.string(),
-    website: z.string(),
-    company: z.object({
-        name: z.string(),
-        catchPhrase: z.string(),
-        bs: z.string()
-    })
-});
+   const todosSchema = z.object({
+    "userId": z.number().min(0),
+    "id": z.number().min(0),
+    "title": z.string(),
+    "completed": z.boolean()            
+    });
 
 const baseURL = process.env.baseURL;
 test('Get all todos', async ({ request }) => {
@@ -36,6 +19,7 @@ test('Get all todos', async ({ request }) => {
         todosSchema.parse(responseJSON[i]);
     }
 });
+
 
 test('Get a todo with id', async ({ request }) => {
     const getAllTodosResponse = await request.get(`${baseURL}/todos`)
