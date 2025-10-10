@@ -26,15 +26,6 @@ const userSchema = z.object({
 });
 
 const baseURL = process.env.baseURL;
-test('Get user by ID', async ({ request }) => {
-
-    const userId = 3;
-    const response = await request.get(`${baseURL}/users/${userId}`);
-    expect(response.status()).toBe(200);
-    const responseBody = await response.json();
-    const parsedSchema = userSchema.parse(responseBody);
-    console.log(parsedSchema);
-});
 
 test('Get all users and validate first user details', async ({ request }) => {
     const getAllUsersResponse = await request.get(`${baseURL}/users`)
@@ -47,10 +38,13 @@ test('Get all users and validate first user details', async ({ request }) => {
     userSchema.parse(userResponseJSON);
 })
 
-test('Get all comments from a post with post id', async ({ request }) => {
-    const postId = 1;
-    const response = await request.get(`${baseURL}/posts/${postId}/comments`);
-    expect(response.status()).toBe(200);
-    const responseBody = await response.json();
-    console.log(responseBody);
-}); 
+test('get all comments from a post with post id call', async ({ request }) => {
+    const response = await request.get(`${baseURL}/posts/1/comments`);
+    const getAllPostsAndIdAndComments = await response.json();
+    const getAllComments = await response.json();
+    const status = response.status();
+    expect(status).toBe(200);
+    for (let i = 0; i < getAllComments.length; i++) {
+        userSchema.parse(getAllComments[i]);
+    }
+});
