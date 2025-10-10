@@ -45,7 +45,6 @@ test('get all comments from a post with post id call', async ({ request }) => {
     const status = response.status();
     expect(status).toBe(200);
     for (let i = 0; i < getAllComments.length; i++) {
-        userSchema.parse(getAllComments[i]);
+     userSchema.parse(getAllComments[i]);
     }
 });
-/////
