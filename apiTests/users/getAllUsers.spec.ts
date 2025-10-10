@@ -19,4 +19,12 @@ test('Get all users',async({request})=>{
     }
 });
 
+test('Get all users and validate first user details',async({request})=>{
+const getAllUsersResponse=await request.get(`${baseURL}/users`)
+const getAllUsersResponseJSON=await getAllUsersResponse.json()
+const firstUserId=getAllUsersResponseJSON[0].id;    
+const userResponse=await request.get(`${baseURL}/users/${firstUserId}`)
+const userResponseJSON=await userResponse.json()
+postSchema.parse(userResponseJSON);
+})
 
