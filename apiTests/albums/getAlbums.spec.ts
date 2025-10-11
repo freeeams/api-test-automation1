@@ -1,5 +1,5 @@
 
-import { test,} from '@playwright/test'
+import { expect, test,} from '@playwright/test'
 import z from 'zod';
 
 const albumSchema = z.object({
@@ -17,6 +17,7 @@ test('Get all albums', async ({ request }) => {
     for (let i = 0; i < responseJSON.length; i++) {
         albumSchema.parse(responseJSON[i]);
     }
+    expect(status).toBe(200);
 });
 
 
@@ -27,6 +28,7 @@ test('Get an album with id', async ({ request }) => {
     const getAlbumResponse = await request.get(`${baseURL}/albums/${albumId}`)
     const getAlbumResponseJSON = await getAlbumResponse.json()
     albumSchema.parse(getAlbumResponseJSON);
+    expect(getAlbumResponse.status()).toBe(200);
 });
 
 //++
