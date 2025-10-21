@@ -1,0 +1,78 @@
+name: Scheduled API Tests - DEV
+
+on:
+  schedule:
+    # Run every day at 2:00 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+env:
+  ENVIRONMENT: dev
+  BASE_URL: ${{ secrets.DEV_BASE_URL }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run API Tests
+        env:
+          BASE_URL: ${{ secrets.DEV_BASE_URL }}
+        run: npm test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-dev
+          path: test-results/
+          retention-days: 30
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-dev
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Publish test results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: API Test Results - DEV
+          path: test-results/results.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: Send Slack notification
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "❌ DEV API Tests Failed - Scheduled Run",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Environment:* DEV\n*Status:* Failed\n*Workflow:* ${{ github.workflow }}\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
