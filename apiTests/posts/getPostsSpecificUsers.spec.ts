@@ -1,4 +1,4 @@
-import {test,expect,} from '@playwright/test'
+import { test, expect, } from '@playwright/test'
 import z from 'zod';
 
 const postSchema = z.object({
@@ -11,10 +11,14 @@ const postSchema = z.object({
 const baseURL = process.env.baseURL;
 
 test('Get posts for specific user', async ({ request }) => {
-    const userId = 1;
+    const getAllUsersResponse = await request.get(`${baseURL}/users`)
+    const getAllUsersResponseJSON = await getAllUsersResponse.json()
+    const firstUserId = getAllUsersResponseJSON[0].id;
+    const userId = firstUserId;
     const response = await request.get(`${baseURL}/posts?userId=${userId}`);
     const status = response.status();
     const responseJSON = await response.json();
+
     expect(status).toBe(200);
 
     for (let i = 0; i < responseJSON.length; i++) {
